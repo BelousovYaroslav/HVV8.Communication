@@ -10,6 +10,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.ObjectInputStream;
 import java.util.LinkedList;
+import javax.swing.Timer;
 import org.apache.log4j.Logger;
 
 /**
@@ -66,23 +67,40 @@ public class SocketReader implements Runnable
                         hvv_timeouts.HVV_TimeoutsManager.getInstance().RemoveId(pTwoWaySocket.m_lTimeOutId);
                         pTwoWaySocket.m_lTimeOutId = 0;
                         
+                        //PROCESS TimeOut
                         pTwoWaySocket.GetCmdInAction().GetProcessor().processTimeOut();
                         
+                        //Increase and check timeouts counter
                         pTwoWaySocket.m_nTimeoutCounter++;
                         if( pTwoWaySocket.m_nTimeoutCounter >= 10) {
-                            logger.warn( pTwoWaySocket.m_pHvvComm.m_strMarker + "10 consequitive timeouts! Disconnecting!");
-                            try {
-                                pTwoWaySocket.disconnect();
-                            } catch( Exception ex) {
-                                logger.error( pTwoWaySocket.m_pHvvComm.m_strMarker + "Exception caught on disconnecting after 10 consequitive timeouts!");
-                            }
+                            logger.warn( pTwoWaySocket.m_pHvvComm.m_strMarker + "10 consequitive timeouts! Pending disconnection...!");
+                            
+                            new Thread( new Runnable() {
+
+                                @Override
+                                public void run() {
+                                    logger.info( pTwoWaySocket.m_pHvvComm.m_strMarker + "..PENDED RxRx disconnection...");
+                                    try {
+                                        pTwoWaySocket.disconnect();
+                                    } catch( Exception ex) {
+                                        logger.error( pTwoWaySocket.m_pHvvComm.m_strMarker + "Exception caught on disconnecting after 10 consequitive timeouts!", ex);
+                                    }
+                                    logger.info( pTwoWaySocket.m_pHvvComm.m_strMarker + "...OVER");
+                                }
+                            }).start();
+                            
+                            //set state
                             pTwoWaySocket.m_pHvvComm.SetState( HVV_Comm_client.STATE_DISCONNECTED);
+                            
+                            //self stop
+                            m_bContinue = false;
                         }
                         else if( pTwoWaySocket.m_nTimeoutCounter > 3) {
                             logger.warn( pTwoWaySocket.m_pHvvComm.m_strMarker + pTwoWaySocket.m_nTimeoutCounter + " consequitive timeouts! Idle!");
                             pTwoWaySocket.m_pHvvComm.SetState( HVV_Comm_client.STATE_CONNECTED_IDLE);
                         }
                         
+                        //drop current action-command
                         pTwoWaySocket.SetCmdInAction( null);
                         
                     }
