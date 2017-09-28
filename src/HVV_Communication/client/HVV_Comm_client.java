@@ -116,11 +116,19 @@ public class HVV_Comm_client implements Runnable {
                 else {
                     if( m_rxtx == null) logger.warn( m_strMarker + "m_rxtx == null");
                     
-                    if( m_rxtx.thrInput == null || m_rxtx.thrInput.isAlive() == false)
-                        logger.warn( m_strMarker + "m_rxtx.thrInput problems");
+                    if( m_rxtx.thrInput != null) {
+                        if( m_rxtx.thrInput.isAlive() == false)
+                            logger.warn( m_strMarker + "m_rxtx.thrInput is dead");
+                    }
+                    else
+                        logger.warn( m_strMarker + "m_rxtx.thrInput is null");
                     
-                    if( m_rxtx.thrOutput == null || m_rxtx.thrOutput.isAlive() == false)
-                        logger.warn( m_strMarker + "m_rxtx.thrOutput problems");
+                    if( m_rxtx.thrOutput != null) {
+                        if( m_rxtx.thrOutput.isAlive() == false)
+                            logger.warn( m_strMarker + "m_rxtx.thrOutput is dead");
+                    }
+                    else
+                        logger.warn( m_strMarker + "m_rxtx.thrOutput is null");
                     
                     if( m_bStopRequested)
                         logger.warn( m_strMarker + "Processing 'QUIT'!");
