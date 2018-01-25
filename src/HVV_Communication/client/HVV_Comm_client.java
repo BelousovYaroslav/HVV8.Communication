@@ -41,6 +41,7 @@ public class HVV_Comm_client implements Runnable {
     public final String m_strMarker;
     
     private int m_nReconnections;
+    public int GetReconnections() { return m_nReconnections;}
     
     public HVV_Comm_client( String strMarker, String strHostConnectTo, int nPortConnectTo) {
         m_strMarker = strMarker;
