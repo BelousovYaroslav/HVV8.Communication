@@ -40,11 +40,14 @@ public class HVV_Comm_client implements Runnable {
     
     public final String m_strMarker;
     
+    private int m_nReconnections;
+    
     public HVV_Comm_client( String strMarker, String strHostConnectTo, int nPortConnectTo) {
         m_strMarker = strMarker;
         m_rxtx = new TwoWaySocket( strHostConnectTo, nPortConnectTo, this);
         m_Thread = null;
         m_nState = STATE_DISCONNECTED;
+        m_nReconnections = -1;
     }
     
     public void start() {
@@ -176,6 +179,8 @@ public class HVV_Comm_client implements Runnable {
                 if( m_bStopRequested == true)
                      break;
                 
+                m_nReconnections++;
+
                 try {
                     m_rxtx.connect();
                 } catch( Exception ex) {
