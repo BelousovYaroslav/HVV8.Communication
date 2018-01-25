@@ -32,6 +32,9 @@ public abstract class HVV_Comm_Server implements Runnable {
     public static final int STATE_CONNECTED_PROBLEMS = 2;
     public static final int STATE_CONNECTED_IDLE = 3;
     
+    private int m_nReconnections;
+    public int GetReconnections() { return m_nReconnections;}
+    
     public Thread m_Thread;
     volatile boolean m_bContinue;
     private final int m_nServerPort;
@@ -53,6 +56,7 @@ public abstract class HVV_Comm_Server implements Runnable {
     protected int m_nStopRequested;
     
     public HVV_Comm_Server( String strMarker, int nServerPort) {
+        m_nReconnections = -1;
         m_strMarker = strMarker;
         m_Thread = null;
         m_nState = STATE_DISCONNECTED;
@@ -198,6 +202,8 @@ public abstract class HVV_Comm_Server implements Runnable {
                     break;
                 }
                 
+                m_nReconnections++;
+                        
                 try {
                     serverSocket = new ServerSocket( m_nServerPort);
                     serverSocket.setSoTimeout( 5000);
