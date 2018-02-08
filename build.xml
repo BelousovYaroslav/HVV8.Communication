@@ -46,7 +46,7 @@
 
 
     <target name="-post-jar">
-        <!-- <delete file="MANIFEST.MF"/> -->
+        <delete file="MANIFEST.MF"/>
     </target>
     
     <!--
